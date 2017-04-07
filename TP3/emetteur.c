@@ -8,42 +8,36 @@
 #include <stdlib.h>
 #include <string.h>
 
-
- struct my_message{
+struct my_message {
     long typeMsg;
     char msg[1000];
 };
-/*typedef struct message message;
-
-struct message{
-
-	long typeMsg;
-	int msg;
-
-};
-typedef message* my_message;*/
-
 
 int main() {
-  printf("a\n" );
   int id, envoi, size;
-  printf("b\n" );
   struct my_message my_msg;
-  printf("c\n" );
   my_msg.typeMsg = 1;
-  printf("d\n" );
 
-  printf("Avant creation file\n" );
-  id = msgget((key_t)1234, 0660 | IPC_CREAT | IPC_EXCL);
-  if(id == -1) {
-    perror("Erreur création file msg");
+  if((id = msgget((key_t)1234, 0660 | IPC_CREAT | IPC_EXCL)) == -1) {
+    perror("Erreur création file de messages");
     exit(1);
   }
 
-  strcpy(my_msg.msg,"Je suis trop fort en SGM !!!\n");
-  size = strlen(my_msg.msg);
-
-  for(int i=0; i<5;i++){
+  for(int i=1; i<6;i++){
+  //  choixMessage(&my_msg, i);
+    switch(i) {
+      case 1: strcpy(my_msg.msg,"Message numéro 1\n");
+      break;
+      case 2: strcpy(my_msg.msg,"Message numéro 2\n");
+      break;
+      case 3: strcpy(my_msg.msg,"Message numéro 3\n");
+      break;
+      case 4: strcpy(my_msg.msg,"Message numéro 4\n");
+      break;
+      case 5: strcpy(my_msg.msg,"Message numéro 5\n");
+      break;
+    }
+    size = strlen(my_msg.msg);
     envoi = msgsnd(id, &my_msg, size +1, 0);
     if(envoi == -1){
       perror("Echec envoi");
@@ -53,8 +47,5 @@ int main() {
       printf("Message envoyé\n");
     }
   }
-
-
-
   return 0;
 }

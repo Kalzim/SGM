@@ -1,4 +1,4 @@
-all: prod cons emetteur recepteur test
+all: prod cons emetteur recepteur
 
 prod : prod.o
 	gcc -o prod prod.o
@@ -12,9 +12,6 @@ emetteur : emetteur.o
 recepteur : recepteur.o
 	gcc -o recepteur recepteur.o
 
-test : test.o
-	gcc -o test test.o
-
 prod.o : prod.c
 	gcc -c prod.c -o prod.o
 
@@ -27,8 +24,5 @@ emetteur.o : emetteur.c
 recepteur.o : recepteur.c
 	gcc -c recepteur.c -o recepteur.o
 
-test.o : test.c
-	gcc -c test.c -o test.o
-
 clean :
-	rm *.o prod cons emetteur recepteur test
+	rm *.o prod cons emetteur recepteur
