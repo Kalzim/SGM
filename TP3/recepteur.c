@@ -23,7 +23,7 @@ int main() {
     exit(1);
   }
 
-  for(int i=1; i<6;i++){
+  for(int i=1; i<4;i++){
     if((reception = msgrcv(id, &my_msg, 1000, 0, 0)) == -1){
       perror("Echec reception");
       exit(1);
@@ -36,7 +36,7 @@ int main() {
 
 
   if(msgctl(id, IPC_RMID, 0) == -1){
-    perror("Erreur destruction semaphores");
+    perror("Erreur destruction de la file de messages");
     exit(1);
   }
 

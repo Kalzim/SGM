@@ -23,28 +23,21 @@ int main() {
     exit(1);
   }
 
-  for(int i=1; i<6;i++){
-  //  choixMessage(&my_msg, i);
+  for(int i=1; i<4;i++){
     switch(i) {
-      case 1: strcpy(my_msg.msg,"Message numéro 1\n");
+      case 1: strcpy(my_msg.msg,"C'est bien");
       break;
-      case 2: strcpy(my_msg.msg,"Message numéro 2\n");
+      case 2: strcpy(my_msg.msg,"pratique ces");
       break;
-      case 3: strcpy(my_msg.msg,"Message numéro 3\n");
-      break;
-      case 4: strcpy(my_msg.msg,"Message numéro 4\n");
-      break;
-      case 5: strcpy(my_msg.msg,"Message numéro 5\n");
+      case 3: strcpy(my_msg.msg,"files de messages.");
       break;
     }
     size = strlen(my_msg.msg);
-    envoi = msgsnd(id, &my_msg, size +1, 0);
+    printf("Message à envoyer n°%d : %s\n", i, my_msg.msg);
+    envoi = msgsnd(id, &my_msg, size+1, 0);
     if(envoi == -1){
       perror("Echec envoi");
       exit(1);
-    }
-    else{
-      printf("Message envoyé\n");
     }
   }
   return 0;
