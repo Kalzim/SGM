@@ -1,18 +1,8 @@
 #include <stdio.h>
-#include <sys/ipc.h>
 #include <sys/sem.h>
-#include <sys/types.h>
 #include <sys/shm.h>
-#include <sys/msg.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
-/*
-typedef struct {
-    int val1;
-    int val2;
-}listeCh;*/
 
 typedef struct element element;
 
@@ -22,17 +12,9 @@ struct element {
 };
 typedef element* liste_chainee;
 
-// semaphores
-struct sembuf sbuf;
-struct sembuf up = {0, 1, 0};
-struct sembuf down = {0, -1, 0};
-
 void libererMemoire(liste_chainee liste) {
-  printf("entree liberation\n");
   if(liste == NULL) return;
   else {
-    /* Sinon, on efface le premier élément et on retourne le reste de la
-    liste effacée */
     element *tmp;
     tmp = liste->next;
     free(liste);
@@ -42,47 +24,82 @@ void libererMemoire(liste_chainee liste) {
 
 void afficherListe(liste_chainee liste) {
     element *tmp = liste;
+    printf("{");
     while(tmp != NULL) {
-        printf("%d \n", tmp->val);
-        tmp = tmp->next;
+      if(tmp->next == NULL) printf("%d", tmp->val);
+      else printf("%d, ", tmp->val);
+      tmp = tmp->next;
     }
+    printf("}\n");
+}
+
+liste_chainee ajoutListe(liste_chainee liste, int valeur) {
+  int loop = 1;
+  element* nouvelElement = malloc(sizeof(element));
+  nouvelElement->val = valeur;
+  element* tmp = liste;
+  if(tmp == NULL) {
+    return nouvelElement;
+  }
+  else {
+    while(loop) {
+      if(tmp->next == NULL) {
+        tmp->next = nouvelElement;
+        loop = 0;
+      }
+      tmp = tmp->next;
+    }
+  }
+  return liste;
 }
 
 int main() {
+  // semaphores
+  int my_sem;
+  struct sembuf upPlein = {0, 1, 0};
+  struct sembuf downPlein = {0, -1, 0};
+  struct sembuf upVide = {1, 1, 0};
+  struct sembuf downVide = {1, -1, 0};
+
   liste_chainee list = NULL;
-  int my_sem, id;
+  int id, res = 0;
   void *compteur;
 
-  my_sem = semget((key_t)1234, 1, 0660);
-  if(my_sem == -1) {
+  if((my_sem = semget((key_t)1234, 0, 0)) == -1) {
     perror("Erreur création sémaphore");
     exit(1);
   }
-  printf("semaphore recupere\n");
-  // entrée en section critique
-  semop(my_sem, &down, 1);
-  printf("entree section critique !!\n");
-  id = shmget((key_t)5678,sizeof(liste_chainee),0660);
-  if (id<0){
+
+  if ((id = shmget((key_t)5678,5*sizeof(liste_chainee),0660)) == -1){
 		perror("Erreur création segment de mémoire partagée");
     exit(1);
 	}
-  printf("shmget OK\n");
 
-  compteur = shmat(id,NULL,0);
-	if (compteur==NULL) {
+	if ((compteur = shmat(id,NULL,0)) == NULL) {
 		perror("Erreur attachement du segment de mémoire partagée");
 		exit(1);
 	}
-  printf("attachement OK\n");
-  memcpy(&list, compteur, sizeof(compteur));
-  // sortie de section critique
-  semop(my_sem, &up, 1);
-  printf("sortie section critique !!\n");
 
+  printf("Début de récupération de la liste chaînée\n");
+  // récupération de la liste chainée
+  for(int i=0; i<5; i++) {
+    // P semaphore plein
+    if(semop(my_sem, &downPlein, 1) == -1) {
+      perror("Erreur lors de l'operation sur le semaphore ");
+      exit(1);
+    }
 
+    memcpy(&res, compteur, sizeof(int));
+    list = ajoutListe(list, res);
+
+    // V semaphore vide
+    if(semop(my_sem, &upVide, 1) == -1) {
+      perror("Erreur lors de l'operation sur le semaphore ");
+      exit(1);
+    }
+  }
+  printf("Liste chaînée reçue : ");
   afficherListe(list);
-  printf("fin d'affichage\n");
   libererMemoire(list);
 
   if(shmdt(compteur) < 0) {
