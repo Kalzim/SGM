@@ -39,7 +39,7 @@ int main() {
     exit(1);
   }
   printf("file de msg recupere\n");
-
+  
   for(int i=0; i<5;i++){
     reception = msgrcv(id, &my_msg, 1000, 0, 0);
     if(reception == -1){

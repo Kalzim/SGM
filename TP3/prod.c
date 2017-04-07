@@ -48,7 +48,8 @@ int main() {
   void *compteur;
 
 // création de la liste chainée
-  for(int i = 0; i < 5; i++){
+  int i = 0;
+  for(; i < 5; i++){
     list = ajoutListe(list, i);
   }
 

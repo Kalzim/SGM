@@ -39,10 +39,9 @@ int main() {
     perror("Erreur création file msg");
     exit(1);
   }
-  
+
   strcpy(my_msg.msg,"Je suis trop fort en SGM !!!\n");
   size = strlen(my_msg.msg);
-
 
   for(int i=0; i<5;i++){
     envoi = msgsnd(id, &my_msg, size +1, 0);
