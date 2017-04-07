@@ -1,16 +1,11 @@
 #include <stdio.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/types.h>
-#include <sys/shm.h>
 #include <sys/msg.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct my_message {
-    long typeMsg;
-    char msg[1000];
+  long typeMsg;
+  char msg[1000];
 };
 
 int main() {

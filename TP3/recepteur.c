@@ -1,16 +1,11 @@
 #include <stdio.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/types.h>
-#include <sys/shm.h>
 #include <sys/msg.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct my_message{
-   long typeMsg;
-   char msg[1000];
+struct my_message {
+  long typeMsg;
+  char msg[1000];
 };
 
 int main() {
@@ -34,12 +29,9 @@ int main() {
     printf("Message n° %d : %s\n",i, my_msg.msg);
   }
 
-
   if(msgctl(id, IPC_RMID, 0) == -1){
     perror("Erreur destruction de la file de messages");
     exit(1);
   }
-
-
   return 0;
 }
